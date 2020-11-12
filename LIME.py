@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 import lime.lime_tabular
 
-train_x = np.load('train_x.npy')
+test_x = np.load('test_x.npy')
 ntimesteps = test_x.shape[1]
 nsignals = test_x.shape[2]
 
