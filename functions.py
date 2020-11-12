@@ -441,24 +441,10 @@ def visualise_pert(name,item_new,item_orig,timestep,timesteps,totalsteps,signals
     
 def visualise_LIME(item,analysis,nsignals,signals,signalnames,predictions,timestep,timesteps,totalsteps):
     plt.clf()
-    fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(10, 9))
-    ax1a = ax1.twinx()
-    ax1a.set_xlabel('timesteps')
-    ax1a.set_ylabel('anomaly probability', color='y')
-    ax1a.plot(list(range(totalsteps)), predictions, color='y')
-    ax1a.tick_params(axis='y', labelcolor='y')
-
-    ax1.set_ylabel('signals')
-    ax1.set_xlabel('timesteps')
+    fig, (ax2, ax3) = plt.subplots(2, 1, figsize=(10, 6))
 
     colors = ['tab:orange', 'g', 'r', 'tab:purple', 'b', 'tab:pink', 'tab:cyan']
-    for i in range(nsignals):
-        ax1.plot(list(range(totalsteps)), signals[:,i], color=colors[i])
-    ax1.axvspan(timestep - timesteps, timestep, color='red', alpha=0.5)
-
-    box = ax1.get_position()
-    ax1.set_position([box.x0, box.y0, box.width * 0.6, box.height])
-    
+  
     ax2.set_xlabel('timesteps')
     ax2.set_ylabel('signals')
     lines = []
@@ -471,20 +457,6 @@ def visualise_LIME(item,analysis,nsignals,signals,signalnames,predictions,timest
     ax2.set_position([box.x0, box.y0, box.width * 0.6, box.height])
 
     ax2.legend(handles= lines,loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True)
-
-    con = ConnectionPatch(xyA=(timestep - timesteps, np.amin(predictions)), xyB=(
-                          timestep - timesteps, np.amax(signals[timestep - timesteps:timestep, :])),
-                          coordsA="data", coordsB="data",
-                          axesA=ax1a, axesB=ax2)
-
-    ax1a.add_artist(con)
-
-    con = ConnectionPatch(xyA=(timestep, np.amin(predictions)),
-                          xyB=(timestep, np.amax(signals[timestep - timesteps :timestep, :])),
-                          coordsA="data", coordsB="data",
-                          axesA=ax1a, axesB=ax2)
-
-    ax1a.add_artist(con)
     
     ax3.set_xlabel('timesteps')
     ax3.set_ylabel('relevance')
