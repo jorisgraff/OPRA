@@ -1,0 +1,4 @@
+#/bin/bash
+cd OPRA/OPRA
+python3 LIME.py
+python3 PertAlt.py
