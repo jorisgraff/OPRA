@@ -372,39 +372,11 @@ def visualise_signal_segment(segment,timesteps):
 def visualise_pert(name,item_new,item_orig,timestep,timesteps,totalsteps,signals,othersignals,nsignals,signalnames,predictions,show_window):
 
     plt.clf()
-    fig, (ax0, ax1, ax2) = plt.subplots(3, 1, figsize=(10, 9))
+    fig, (ax2) = plt.subplots(1, 1, figsize=(10, 3))
     
-    ax0a = ax0.twinx()
-    ax0.set_xlabel('timesteps')
-    ax0.set_ylabel('setpoint')
-    ax0.plot(list(range(totalsteps)),othersignals[:,1],color = 'r')
-    ax0.tick_params(labelcolor='r')
-    
-    ax0a.set_ylabel('rotation speed')
-    ax0a.set_ylim([0,27000])
-    ax0a.plot(list(range(totalsteps)),othersignals[:,0],color = 'b')
-    ax0a.tick_params(labelcolor='b')
-    
-    box = ax0.get_position()
-    ax0.set_position([box.x0, box.y0, box.width * 0.6, box.height])
-
-    ax1a = ax1.twinx()
-    ax1a.set_xlabel('timesteps')
-    ax1a.set_ylabel('ignition probability', color='y')
-    ax1a.plot(list(range(totalsteps)), predictions, color='y')
-    ax1a.tick_params(axis='y', labelcolor='y')
-
-    ax1.set_ylabel('signals')
-    ax1.set_xlabel('timesteps')
 
     colors = ['tab:orange', 'g', 'r', 'tab:purple', 'b', 'tab:pink', 'tab:cyan']
     colors2 = [mcd.CSS4_COLORS['moccasin'],mcd.CSS4_COLORS['lightgreen'],mcd.CSS4_COLORS['lightcoral'],mcd.CSS4_COLORS['thistle'],mcd.CSS4_COLORS['lightskyblue'],mcd.CSS4_COLORS['lavenderblush'],mcd.CSS4_COLORS['lightcyan']]
-    for i in range(nsignals):
-        ax1.plot(list(range(totalsteps)), signals[:,i], color=colors[i])
-    ax1.axvspan(timestep - timesteps, timestep, color='red', alpha=0.5)
-
-    box = ax1.get_position()
-    ax1.set_position([box.x0, box.y0, box.width * 0.6, box.height])
 
     ax2.set_xlabel('timesteps')
     ax2.set_ylabel('signals')
@@ -421,20 +393,6 @@ def visualise_pert(name,item_new,item_orig,timestep,timesteps,totalsteps,signals
     ax2.set_position([box.x0, box.y0, box.width * 0.6, box.height])
 
     ax2.legend(handles= lines,loc='center left', bbox_to_anchor=(1, 0.5),ncol=2, fancybox=True)
-
-    con = ConnectionPatch(xyA=(timestep - timesteps, np.amin(predictions)), xyB=(
-                          timestep - timesteps, np.amax(signals[timestep - timesteps:timestep, :])),
-                          coordsA="data", coordsB="data",
-                          axesA=ax1a, axesB=ax2)
-
-    ax1a.add_artist(con)
-
-    con = ConnectionPatch(xyA=(timestep, np.amin(predictions)),
-                          xyB=(timestep, np.amax(signals[timestep - timesteps :timestep, :])),
-                          coordsA="data", coordsB="data",
-                          axesA=ax1a, axesB=ax2)
-
-    ax1a.add_artist(con)
 
 
     plt.savefig('perturbation{}'.format(name))
