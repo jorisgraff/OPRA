@@ -1,0 +1,3 @@
+#/bin/bash
+cd OPRA/OPRA
+python3 LIME.py
