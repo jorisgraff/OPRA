@@ -83,59 +83,74 @@ for item in exp:
 
 exp_array = exp_array.reshape((ntimesteps,nsignals))
 
+threshold = 2*np.std(exp_array)
+
 relevance = np.abs(exp_array)
-totalrelevance = np.zeros(29)
-for i in range(29):
-    totalrelevance[i] = np.sum(relevance[:,i])
-ranking = np.argsort(totalrelevance)
-selection = ranking[0:4]
+
+count = 0
+
+for i in range(ntimesteps):
+    for j in range(nsignals):
+        if relevance[i,j]>=threshold:
+            count = count+1
+proportion = count/(ntimesteps*nsignals)
+
+output_file = open("LIME_output.txt","w")
+output_file.write("The number of relevant steps is {} which is {} of total".format(count,proportion))
+output_file.close()
+            
+#totalrelevance = np.zeros(29)
+#for i in range(29):
+    #totalrelevance[i] = np.sum(relevance[:,i])
+#ranking = np.argsort(totalrelevance)
+#selection = ranking[0:4]
 
 # This file contains the downsampled data.
-data = pd.read_csv('reduced_data')
+#data = pd.read_csv('reduced_data')
 
 # The first column is an artifact; remove it.
-data = data.iloc[:, 1:33]
+#data = data.iloc[:, 1:33]
 
 # Extract all signals and signal names that matter. The setpoint and rotation
 # speed values are kept apart.
-signalnames = data.columns.to_numpy()
-signalnames = signalnames[0:30]
-signalnames = np.delete(signalnames, 10)
-signals = data.to_numpy()
-differentsignals = signals[:, np.array([10, 30])]
-signals = signals[:, 0:30]
-signals = np.delete(signals, 10, 1)
+#signalnames = data.columns.to_numpy()
+#signalnames = signalnames[0:30]
+#signalnames = np.delete(signalnames, 10)
+#signals = data.to_numpy()
+#differentsignals = signals[:, np.array([10, 30])]
+#signals = signals[:, 0:30]
+#signals = np.delete(signals, 10, 1)
 
-stds = np.load('stds.npy')
-means = np.load('means.npy')
+#stds = np.load('stds.npy')
+#means = np.load('means.npy')
 
 # Normalise the signals according to Z-score.
-for i in range(29):
-    if stds[i] != 0:
-        signals[:,i] = (signals[:,i] - means[i]) / stds[i]
-    else:
-        signals[:,i] = np.zeros(len(total_predictions))
+#for i in range(29):
+    #if stds[i] != 0:
+        #signals[:,i] = (signals[:,i] - means[i]) / stds[i]
+    #else:
+        #signals[:,i] = np.zeros(len(total_predictions))
 
 
-predictions = model.predict(test_x)
+#predictions = model.predict(test_x)
 
-total_predictions = np.zeros(data.shape[0])
+#total_predictions = np.zeros(data.shape[0])
 
 # Iterate over each timestep. If it is part of the test set it is given
 # the corresponding value; otherwise, its prediction is set to 0 by default.
-i = 0
-j = 427
-k = 0
-for i in range(len(predictions)):
-    total_predictions[j] = predictions[i]
-    j = j + 1
-    if j == indices2[k] and k < 5:
-        k = k + 1
-        j = indices1[k]
+#i = 0
+#j = 427
+#k = 0
+#for i in range(len(predictions)):
+    #total_predictions[j] = predictions[i]
+    #j = j + 1
+    #if j == indices2[k] and k < 5:
+        #k = k + 1
+        #j = indices1[k]
 
-item2 = test_item_orig[:, selection]
-signals2 = signals[:, selection]
-signalnames2 = signalnames[selection]
-exp_array2 = exp_array[:,selection]
+#item2 = test_item_orig[:, selection]
+#signals2 = signals[:, selection]
+#signalnames2 = signalnames[selection]
+#exp_array2 = exp_array[:,selection]
 
-visualise_LIME(item2,exp_array2,4,signals2,signalnames2,total_predictions,index1,test_x.shape[1],len(total_predictions))
+#visualise_LIME(item2,exp_array2,4,signals2,signalnames2,total_predictions,index1,test_x.shape[1],len(total_predictions))
