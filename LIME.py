@@ -26,25 +26,6 @@ model = model_from_json(loaded_model_json)
 # load weights into new model
 model.load_weights("smallmodel0.35.h5")
 
-indices1 = [427,5285,19182,19531,20318,20701]
-indices2 = [439,5298,19195,19546,20331,20714]
-
-index1 = 19540
-index2 = 0
-help = 0
-switch = 0
-auxiliary_index = indices1[help]
-while auxiliary_index != index1:
-    if auxiliary_index == indices2[help]:
-        help = help + 1
-        auxiliary_index = indices1[help]
-    else:
-        auxiliary_index = auxiliary_index + 1
-    index2 = index2 + 1
-
-test_item = test_x_flattened[index2]
-test_item_orig = test_x[index2]
-
 def predict_flat_instances(flat_array):
     # load json and create model
     json_file = open('modelsmall0.35.json', 'r')
@@ -65,39 +46,61 @@ def predict_flat_instances(flat_array):
 
     for i in range(prediction.shape[0]):
         totalpredictions[i,0] = prediction[i]
+
         totalpredictions[i,1] = negprediction[i]
 
     print(totalpredictions)
 
     return(totalpredictions)
 
-explainer = lime.lime_tabular.LimeTabularExplainer(test_x_flattened,'classification',discretize_continuous=False,verbose=True)
-exp = explainer.explain_instance(test_item,predict_flat_instances,num_features=ntimesteps*nsignals)
+indices1 = [427,5285,19182,19531,20318,20701]
+indices2 = [439,5298,19195,19546,20331,20714]
 
-exp = exp.as_list()
+for index in [430,437,5289,19183,19192,19535,19542,20322,20330,20711]:
 
-exp_array = np.empty(nsignals*ntimesteps)
+    index1 = index
+    index2 = 0
+    help = 0
+    switch = 0
+    auxiliary_index = indices1[help]
+    while auxiliary_index != index1:
+        if auxiliary_index == indices2[help]:
+            help = help + 1
+            auxiliary_index = indices1[help]
+        else:
+            auxiliary_index = auxiliary_index + 1
+        index2 = index2 + 1
 
-for item in exp:
-    exp_array[int(item[0])] = item[1]
+    test_item = test_x_flattened[index2]
+    test_item_orig = test_x[index2]
 
-exp_array = exp_array.reshape((ntimesteps,nsignals))
+    explainer = lime.lime_tabular.LimeTabularExplainer(test_x_flattened,'classification',discretize_continuous=False,verbose=True)
+    exp = explainer.explain_instance(test_item,predict_flat_instances,num_features=ntimesteps*nsignals)
 
-threshold = 2*np.std(exp_array)
+    exp = exp.as_list()
 
-relevance = np.abs(exp_array)
+    exp_array = np.empty(nsignals*ntimesteps)
 
-count = 0
+    for item in exp:
+        exp_array[int(item[0])] = item[1]
 
-for i in range(ntimesteps):
-    for j in range(nsignals):
-        if relevance[i,j]>=threshold:
-            count = count+1
-proportion = count/(ntimesteps*nsignals)
+    exp_array = exp_array.reshape((ntimesteps,nsignals))
 
-output_file = open("LIME_output.txt","w")
-output_file.write("The number of relevant steps is {} which is {} of total".format(count,proportion))
-output_file.close()
+    threshold = np.std(exp_array)
+
+    relevance = np.abs(exp_array)
+
+    count = 0
+
+    for i in range(ntimesteps):
+        for j in range(nsignals):
+            if relevance[i,j]>=threshold:
+                count = count+1
+    proportion = count/(ntimesteps*nsignals)
+
+    output_file = open("LIME_output {}.txt".format(index1),"w")
+    output_file.write("The number of relevant steps is {} which is {} of total".format(count,proportion))
+    output_file.close()
             
 #totalrelevance = np.zeros(29)
 #for i in range(29):
